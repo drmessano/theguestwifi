@@ -68,7 +68,7 @@ if (isset($_REQUEST["api"])) { readfile($passphrase); die; }
 </style>
 <?php if(isset($favicon)) { printf($favicon."\n"); }?>
 <body>
-TheGuestWifi
+TheGuestWiFi
 <br>
 <picture>
  <source srcset="<?= $qrdark; ?>" media="(prefers-color-scheme: dark)">
@@ -81,7 +81,7 @@ Password: <?php readfile($passphrase); ?>
 <br><br>
 Scripting users: Use https://<?= $_SERVER['HTTP_HOST']; ?>?api to retrieve the daily password.
 <br><br>
-Developers: TheGuestWifi is a project hosted on <a style="text-decoration:none" href="https://github.com/drmessano/theguestwifi">GitHub</a>
+Developers: TheGuestWiFi is a project hosted on <a style="text-decoration:none" href="https://github.com/drmessano/theguestwifi">GitHub</a>
 <br><br>
 <?php if(isset($cflag)) { printf ($cflag); if(isset($lflag)) { printf ($lflag); }}?>
 Provided courtesy of <a style="text-decoration:none" href="https://www.2l2o.com">2l2o</a>

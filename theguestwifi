@@ -1,0 +1,48 @@
+#!/bin/bash
+exportpath=/var/www/theguestwifi
+dictionary=/etc/dictionaries-common/words
+passlen=0
+# Optional API address of Primary server if this is a Replica
+primary=https://www.theguestwifi.com?api
+while getopts ":c:l:d:r" arg; do
+  case $arg in
+    c) country=$OPTARG;;
+    l) lang=$OPTARG;;
+    d) dict=$OPTARG;;
+    r) replica=true;;
+  esac
+done
+if [[ $country && ${#country} = 2 ]]; then
+ country=${country,,}
+ locpath=$exportpath/locales/$country
+ locapi='&country='$country
+ if [[ ! -d $locpath ]]; then mkdir -p $locpath; fi
+ if [[ $lang && ${#lang} = 2 ]]; then
+  if [[ $dict && -f /usr/share/dict/$dict ]]; then
+   dictionary=/usr/share/dict/${dict,,}
+   lang=${lang,,}
+   locpath=$exportpath/locales/$country/$lang
+   locapi='&country='$country'&lang='$lang
+   if [[ ! -d $locpath ]]; then mkdir -p $locpath; fi
+  fi
+ fi
+else
+ locpath=$exportpath
+fi
+if [[ $replica && $primary ]]; then
+ pass=$(curl -s $primary$locapi)
+else
+ while [ $passlen -ne 8 ]; do
+  pass=$(shuf -n1 $dictionary | sed s/\'s// | tr '[:upper:]' '[:lower:]')
+  passlen=$(printf $pass | wc -m)
+ done
+fi
+if [ -z $pass ]; then printf 'Passphrase Error!\n'; exit; fi
+printf $pass'\n'
+qrencode -s 30 --background=F0FFFF -o $locpath/qr.png 'WIFI:S:TheGuestWifi;T:WPA2;P:'$pass';;'
+qrencode -s 30 --background=151B54 --foreground=FFFFFF -o $locpath/qr-dark.png 'WIFI:S:TheGuestWifi;T:WPA2;P:'$pass';;'
+printf $pass | tee $locpath/passphrase >/dev/null
+# Optional Telegram Message
+# botapi=[BOT_API_KEY]
+# botchan=[MY_CHANNEL_NAME]
+# curl -s -o /dev/null 'https://api.telegram.org/bot'$botapi'/sendMessage?chat_id=@'$botchan$ucountry'&text='$pass
